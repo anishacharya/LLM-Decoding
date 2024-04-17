@@ -15,6 +15,8 @@ if __name__ == '__main__':
 	
 	model = AutoModelForCausalLM.from_pretrained(nw).to(device)
 	tokenizer = AutoTokenizer.from_pretrained(nw)
+	# Number of parameters
+	print("Number of parameters:", model.num_parameters())
 	
 	context = 'I enjoy walking with my cute dog'
 	tokenized_context = tokenizer(context, return_tensors='pt')
