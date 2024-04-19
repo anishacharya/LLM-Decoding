@@ -85,30 +85,33 @@ def decode(
 	tok_context = tok(context, return_tensors='pt')
 	tok_context = {k: v.to(device) for k, v in tok_context.items()}
 	
-	# Generate the output
-	if decoding_strategy == 'greedy':
-		output = model.generate(
-			**tok_context,
-			max_new_tokens=max_output_len,
-		)
-		custom_output = custom_greedy(
-			model=model,
-			tok_context=tok_context,
-			max_new_tokens=max_output_len,
-		)
-		assert (output[i] == custom_output[i] for i in range(len(output)))
+	model.eval()
 	
-	elif decoding_strategy == 'beam_search':
-		# activate beam search and early_stopping
-		output = model.generate(
-			**tok_context,
-			max_new_tokens=max_output_len,
-			num_beams=num_beams,
-			early_stopping=True
-		)
-	
-	else:
-		raise NotImplementedError
+	with torch.no_grad():
+		# Generate the output
+		if decoding_strategy == 'greedy':
+			output = model.generate(
+				**tok_context,
+				max_new_tokens=max_output_len,
+			)
+			custom_output = custom_greedy(
+				model=model,
+				tok_context=tok_context,
+				max_new_tokens=max_output_len,
+			)
+			assert (output[i] == custom_output[i] for i in range(len(output)))
+		
+		elif decoding_strategy == 'beam_search':
+			# activate beam search and early_stopping
+			output = model.generate(
+				**tok_context,
+				max_new_tokens=max_output_len,
+				num_beams=num_beams,
+				early_stopping=True
+			)
+		
+		else:
+			raise NotImplementedError
 	
 	# Decode the generated output
 	decoded_output = tokenizer.decode(output[0], skip_special_tokens=True)
@@ -117,7 +120,8 @@ def decode(
 
 
 if __name__ == '__main__':
-	# Example taken from: https://huggingface.co/blog/how-to-generate
+	# Example taken from:
+	# https://huggingface.co/blog/how-to-generate
 	seed = 42
 	nw = 'distilbert/distilgpt2'
 	max_gen_seq_len = 100
@@ -125,9 +129,13 @@ if __name__ == '__main__':
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	
 	seed_everything(seed=seed)
-	LLM = AutoModelForCausalLM.from_pretrained(nw).to(device)
-	tok = AutoTokenizer.from_pretrained(nw)
 	
+	tok = AutoTokenizer.from_pretrained(nw)
+	LLM = AutoModelForCausalLM.from_pretrained(
+		pretrained_model_name_or_path=nw,
+		pad_token_id=tok.eos_token_id
+	)
+	LLM = LLM.to(device)
 	print("Number of parameters:", LLM.num_parameters())
 	
 	test_x = 'I enjoy walking with my cute dog'
