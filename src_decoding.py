@@ -106,8 +106,7 @@ def decode(
 			output = model.generate(
 				**tok_context,
 				max_new_tokens=max_output_len,
-				num_beams=num_beams,
-				early_stopping=True
+				num_beams=num_beams
 			)
 		
 		else:
@@ -138,7 +137,7 @@ if __name__ == '__main__':
 	LLM = LLM.to(device)
 	print("Number of parameters:", LLM.num_parameters())
 	
-	test_x = 'I enjoy walking with my cute dog ..'
+	test_x = 'I enjoy walking with my cute dog'
 	
 	# greedy_output = decode(
 	# 	model=LLM,
