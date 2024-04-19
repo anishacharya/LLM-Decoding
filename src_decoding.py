@@ -122,7 +122,7 @@ if __name__ == '__main__':
 	# Example taken from:
 	# https://huggingface.co/blog/how-to-generate
 	seed = 42
-	nw = 'distilbert/distilgpt2'
+	nw = 'gpt2'
 	max_gen_seq_len = 100
 	
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
