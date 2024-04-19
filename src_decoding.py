@@ -70,6 +70,7 @@ def decode(
 		output = model.generate(
 			**tokenized_context,
 			max_new_tokens=max_output_len,
+			early_stopping=True,
 			do_sample=False
 		)
 		custom_output = custom_greedy(
@@ -88,7 +89,7 @@ def decode(
 	custom_decoded_output = tokenizer.decode(custom_output[0], skip_special_tokens=True)
 	
 	print("{} Output:\n" + 100 * '-'.format(decoding_strategy))
-	print(decoder_output)
+	print(decoded_output)
 	print("{} Custom Implementation Output:\n" + 100 * '-'.format(decoding_strategy))
 	print(custom_decoded_output)
 	
@@ -99,7 +100,7 @@ if __name__ == '__main__':
 	# Example taken from: https://huggingface.co/blog/how-to-generate
 	seed = 42
 	nw = 'distilbert/distilgpt2'
-	max_gen_seq_len = 10
+	max_gen_seq_len = 100
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	
 	seed_everything(seed=seed)
