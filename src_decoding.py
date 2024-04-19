@@ -145,8 +145,7 @@ if __name__ == '__main__':
 		max_output_len=max_gen_seq_len,
 		decoding_strategy='greedy'
 	)
-	print(f"Greedy Decoding\n" + 100 * "-")
-	print(greedy_output)
+	print(f"\n Greedy Decoding\n" + 100 * "-")
 	
 	BEAM_SIZE = [2, 3, 5, 10, 20]
 	
@@ -160,7 +159,7 @@ if __name__ == '__main__':
 			num_beams=beam_size,
 			decoding_strategy='beam_search'
 		)
-		print(f"{beam_size}-Beam Search Decoding\n" + 100 * "-")
+		print(f"\n {beam_size}-Beam Search Decoding\n" + 100 * "-")
 		print(beam_search_output)
 
 
