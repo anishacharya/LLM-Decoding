@@ -138,17 +138,17 @@ if __name__ == '__main__':
 	LLM = LLM.to(device)
 	print("Number of parameters:", LLM.num_parameters())
 	
-	test_x = 'I enjoy walking with my cute dog'
+	test_x = 'I enjoy walking with my cute dog ..'
 	
-	greedy_output = decode(
-		model=LLM,
-		tokenizer=tok,
-		context=test_x,
-		max_output_len=max_gen_seq_len,
-		decoding_strategy='greedy'
-	)
-	print(f"Greedy Decoding\n" + 100 * "-")
-	print(greedy_output)
+	# greedy_output = decode(
+	# 	model=LLM,
+	# 	tokenizer=tok,
+	# 	context=test_x,
+	# 	max_output_len=max_gen_seq_len,
+	# 	decoding_strategy='greedy'
+	# )
+	# print(f"Greedy Decoding\n" + 100 * "-")
+	# print(greedy_output)
 	
 	BEAM_SIZES = [2, 3, 5, 10]
 	
