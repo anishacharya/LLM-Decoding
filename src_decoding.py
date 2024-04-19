@@ -26,12 +26,11 @@ def custom_greedy(
 	Custom Greedy decoding :
 	
 	:param model: Pre-trained language model
-	
 	:param tok_context: Tokenized context (input_ids)
-	
 	:param max_new_tokens: Maximum number of tokens to generate
 	
-	:return:
+	:return: Generated tokens
+	
 	"""
 	MAX_GEN_TOKENS = max_new_tokens
 	CHUNK_SIZE = model.config.max_position_embeddings
@@ -106,7 +105,8 @@ def decode(
 			output = model.generate(
 				**tok_context,
 				max_new_tokens=max_output_len,
-				num_beams=num_beams
+				num_beams=num_beams,
+				early_stopping=True,
 			)
 		
 		else:
@@ -139,27 +139,29 @@ if __name__ == '__main__':
 	
 	test_x = 'I enjoy walking with my cute dog'
 	
-	# greedy_output = decode(
-	# 	model=LLM,
-	# 	tokenizer=tok,
-	# 	context=test_x,
-	# 	max_output_len=max_gen_seq_len,
-	# 	decoding_strategy='greedy'
-	# )
-	# print(f"Greedy Decoding\n" + 100 * "-")
-	# print(greedy_output)
-	
-	BEAM_SIZE = 2
-	
-	beam_search_output = decode(
+	greedy_output = decode(
 		model=LLM,
 		tokenizer=tok,
 		context=test_x,
 		max_output_len=max_gen_seq_len,
-		num_beams=BEAM_SIZE,
-		decoding_strategy='beam_search'
+		decoding_strategy='greedy'
 	)
-	print(f"Beam Search Decoding\n" + 100 * "-")
-	print(beam_search_output)
+	print(f"Greedy Decoding\n" + 100 * "-")
+	print(greedy_output)
+	
+	BEAM_SIZE = [2, 3, 5, 10, 20]
+	
+	for beam_size in BEAM_SIZE:
+		print(f"Beam Search Decoding with beam size: {beam_size}\n" + 100 * "-")
+		beam_search_output = decode(
+			model=LLM,
+			tokenizer=tok,
+			context=test_x,
+			max_output_len=max_gen_seq_len,
+			num_beams=beam_size,
+			decoding_strategy='beam_search'
+		)
+		print(f"{beam_size}-Beam Search Decoding\n" + 100 * "-")
+		print(beam_search_output)
 
 
