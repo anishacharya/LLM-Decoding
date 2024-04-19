@@ -79,3 +79,86 @@ I enjoy walking with my cute dog," she said.
 "I love walking with my cute dog," she said.
 
 "I love walking with my cute dog," she
+Number of parameters: 124439808
+Greedy Decoding
+----------------------------------------------------------------------------------------------------
+I enjoy walking with my cute dog, but I'm not sure if I'll ever be able to walk with my dog. I'm not sure if I'll ever be able to walk with my dog.
+
+I'm not sure if I'll ever be able to walk with my dog. I'm not sure if I'll ever be able to walk with my dog.
+
+I'm not sure if I'll ever be able to walk with my dog. I'm not sure if I'll ever be able to walk with my
+Beam Search Decoding with beam size: 2
+----------------------------------------------------------------------------------------------------
+2-Beam Search Decoding
+----------------------------------------------------------------------------------------------------
+I enjoy walking with my cute dog, but I don't think I'll ever be able to walk with my dog again.
+
+I'm not sure if I'll ever be able to walk with my dog again, but I don't think I'll ever be able to walk with my dog again.
+
+I'm not sure if I'll ever be able to walk with my dog again, but I don't think I'll ever be able to walk with my dog again.
+
+I'm not sure if I'll ever
+Beam Search Decoding with beam size: 3
+----------------------------------------------------------------------------------------------------
+3-Beam Search Decoding
+----------------------------------------------------------------------------------------------------
+I enjoy walking with my cute dog, but I don't think I'll ever be able to walk with my dog again.
+
+I'm not sure if I'll ever be able to walk with my dog again.
+
+I'm not sure if I'll ever be able to walk with my dog again.
+
+I'm not sure if I'll ever be able to walk with my dog again.
+
+I'm not sure if I'll ever be able to walk with my dog again.
+
+I'm not sure
+Beam Search Decoding with beam size: 5
+----------------------------------------------------------------------------------------------------
+5-Beam Search Decoding
+----------------------------------------------------------------------------------------------------
+I enjoy walking with my cute dog, but I'm not sure if I'll ever be able to walk with him again.
+
+I'm not sure if I'll ever be able to walk with him again.
+
+I'm not sure if I'll ever be able to walk with him again.
+
+I'm not sure if I'll ever be able to walk with him again.
+
+I'm not sure if I'll ever be able to walk with him again.
+
+I'm not sure if I'll ever
+Beam Search Decoding with beam size: 10
+----------------------------------------------------------------------------------------------------
+10-Beam Search Decoding
+----------------------------------------------------------------------------------------------------
+I enjoy walking with my cute dog, but I don't know if I'll ever be able to walk with him again."
+
+"I don't know if I'll ever be able to walk with him again."
+
+"I don't know if I'll ever be able to walk with him again."
+
+"I don't know if I'll ever be able to walk with him again."
+
+"I don't know if I'll ever be able to walk with him again."
+
+"I don't
+Beam Search Decoding with beam size: 20
+----------------------------------------------------------------------------------------------------
+20-Beam Search Decoding
+----------------------------------------------------------------------------------------------------
+I enjoy walking with my cute dog," she said.
+
+"I love walking with my cute dog," she said.
+
+"I love walking with my cute dog," she said.
+
+"I love walking with my cute dog," she said.
+
+"I love walking with my cute dog," she said.
+
+"I love walking with my cute dog," she said.
+
+"I love walking with my cute dog," she said.
+
+"I love walking with my cute dog," she
