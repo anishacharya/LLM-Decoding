@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	
 	model = AutoModelForCausalLM.from_pretrained(nw).to(device)
-	tokenizer = AutoTokenizer.from_pretrained(nw)
+	tokenizer = AutoTokenizer.from_pretrained(nw).to(device)
 	# Number of parameters
 	print("Number of parameters:", model.num_parameters())
 	
