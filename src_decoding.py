@@ -149,18 +149,17 @@ if __name__ == '__main__':
 	# print(f"Greedy Decoding\n" + 100 * "-")
 	# print(greedy_output)
 	
-	BEAM_SIZES = [2]
+	BEAM_SIZE = 2
 	
-	for n_beam in BEAM_SIZES:
-		beam_search_output = decode(
-			model=LLM,
-			tokenizer=tok,
-			context=test_x,
-			max_output_len=max_gen_seq_len,
-			num_beams=n_beam,
-			decoding_strategy='beam_search'
-		)
-		print(f"Beam Search Decoding with Beam Size = {n_beam}\n" + 100 * "-")
-		print(beam_search_output)
+	beam_search_output = decode(
+		model=LLM,
+		tokenizer=tok,
+		context=test_x,
+		max_output_len=max_gen_seq_len,
+		num_beams=BEAM_SIZE,
+		decoding_strategy='beam_search'
+	)
+	print(f"Beam Search Decoding\n" + 100 * "-")
+	print(beam_search_output)
 
 
