@@ -1,8 +1,12 @@
 """
 Text Summarization
 - Text summarization is the process of distilling the most important information from a source text.
+
+Generate HF
+https://github.com/huggingface/transformers/blob/v4.39.3/src/transformers/generation/utils.py#L1224
 """
 from tqdm import tqdm
+from typing import Dict
 
 import torch
 import torch.nn.functional as F
@@ -13,18 +17,26 @@ from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 
 
-def custom_greedy(model, tok_context, **gen_config):
+def custom_greedy(
+		model,
+		tok_context,
+		max_new_tokens: int = 40,
+):
 	"""
-	Custom greedy decoding
-	:param model:
-	:param tok_context:
-	:param gen_config:
+	Custom Greedy decoding :
+	
+	:param model: Pre-trained language model
+	
+	:param tok_context: Tokenized context (input_ids)
+	
+	:param max_new_tokens: Maximum number of tokens to generate
+	
 	:return:
 	"""
-	MAX_GEN_TOKENS = gen_config.pop("max_new_tokens", 100)
+	MAX_GEN_TOKENS = max_new_tokens
 	CHUNK_SIZE = model.config.max_position_embeddings
 	
-	context = tok_context['input_ids']
+	curr_gen = tok_context['input_ids']  # initialized with the input_ids
 	past_key_values = None
 	
 	model.eval()
@@ -32,26 +44,28 @@ def custom_greedy(model, tok_context, **gen_config):
 	with torch.no_grad():
 		# Generate new tokens - Sequential Decoding
 		for _ in tqdm(range(MAX_GEN_TOKENS)):
-			block_context = context[:, -CHUNK_SIZE:]
+			block_context = curr_gen[:, -CHUNK_SIZE:]
 			model_out = model(block_context, past_key_values)
 			logits = model_out.logits  # / TEMP
-			probs = F.softmax(logits[:, -1, :], dim=-1)
+			logits = logits[:, -1, :]  # Last token Logits
+			probs = F.softmax(logits, dim=-1)
 			
 			# if DO_SAMPLE:
 			# 	new_token = torch.multinomial(probs, 1)
 			# else:
 			
 			new_token = torch.argmax(probs, dim=-1, keepdim=True)
-			context = torch.cat([context, new_token], dim=-1)
+			curr_gen = torch.cat([curr_gen, new_token], dim=-1)
 	
-	return context
+	return curr_gen
 
 
 def decode(
 		model,
 		tokenizer,
 		context,
-		max_output_len,
+		max_output_len: int = 100,
+		num_beams: int = 5,
 		decoding_strategy: str = 'greedy'
 ):
 	"""
@@ -61,6 +75,8 @@ def decode(
 	:param tokenizer: Tokenizer
 	:param context:  Context
 	:param max_output_len: Maximum output length
+	:param num_beams: Number of beams for beam search
+	
 	:param decoding_strategy: Decoding strategy
 	
 	:return: Decoded output
@@ -74,25 +90,28 @@ def decode(
 		output = model.generate(
 			**tok_context,
 			max_new_tokens=max_output_len,
-			early_stopping=True,
-			do_sample=False
 		)
 		custom_output = custom_greedy(
 			model=model,
 			tok_context=tok_context,
 			max_new_tokens=max_output_len,
-			early_stopping=True,
-			do_sample=False
 		)
 		assert (output[i] == custom_output[i] for i in range(len(output)))
+	
+	elif decoding_strategy == 'beam_search':
+		# activate beam search and early_stopping
+		output = model.generate(
+			**tok_context,
+			max_new_tokens=max_output_len,
+			num_beams=num_beams,
+			early_stopping=True
+		)
 	
 	else:
 		raise NotImplementedError
 	
 	# Decode the generated output
 	decoded_output = tokenizer.decode(output[0], skip_special_tokens=True)
-	print("{} Decoding Output:\n" + 100 * '-'.format(decoding_strategy))
-	print(decoded_output)
 	
 	return decoded_output
 
@@ -102,20 +121,39 @@ if __name__ == '__main__':
 	seed = 42
 	nw = 'distilbert/distilgpt2'
 	max_gen_seq_len = 100
+	
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	
 	seed_everything(seed=seed)
 	LLM = AutoModelForCausalLM.from_pretrained(nw).to(device)
 	tok = AutoTokenizer.from_pretrained(nw)
+	
 	print("Number of parameters:", LLM.num_parameters())
 	
 	test_x = 'I enjoy walking with my cute dog'
 	
-	decoder_output = decode(
+	greedy_output = decode(
 		model=LLM,
 		tokenizer=tok,
 		context=test_x,
-		max_output_len=max_gen_seq_len
+		max_output_len=max_gen_seq_len,
+		decoding_strategy='greedy'
 	)
+	print(f"Greedy Decoding\n" + 100 * "-")
+	print(greedy_output)
+	
+	BEAM_SIZES = [2, 3, 5, 10]
+	
+	for n_beam in BEAM_SIZES:
+		beam_search_output = decode(
+			model=LLM,
+			tokenizer=tok,
+			context=test_x,
+			max_output_len=max_gen_seq_len,
+			num_beams=n_beam,
+			decoding_strategy='beam_search'
+		)
+		print(f"Beam Search Decoding with Beam Size = {n_beam}\n" + 100 * "-")
+		print(beam_search_output)
 
 
