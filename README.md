@@ -1,4 +1,4 @@
-# JailBreak-LLM
+# Decoding - LLM
 
 ## References:
 

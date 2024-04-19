@@ -106,7 +106,6 @@ def decode(
 				**tok_context,
 				max_new_tokens=max_output_len,
 				num_beams=num_beams,
-				early_stopping=True,
 			)
 		
 		else:
