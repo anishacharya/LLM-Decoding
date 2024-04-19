@@ -23,8 +23,6 @@ def custom_greedy(model, tok_context, **gen_config):
 	"""
 	MAX_GEN_TOKENS = gen_config.pop("max_new_tokens", 100)
 	CHUNK_SIZE = model.config.max_position_embeddings
-	TEMP = gen_config.pop("temperature", 1.0)
-	DO_SAMPLE = gen_config.pop("do_sample", False)
 	
 	context = tok_context['input_ids']
 	past_key_values = None
@@ -36,7 +34,7 @@ def custom_greedy(model, tok_context, **gen_config):
 		for _ in tqdm(range(MAX_GEN_TOKENS)):
 			block_context = context[:, -CHUNK_SIZE:]
 			model_out = model(block_context, past_key_values)
-			logits = model_out.logits / TEMP
+			logits = model_out.logits  # / TEMP
 			probs = F.softmax(logits[:, -1, :], dim=-1)
 			
 			# if DO_SAMPLE:
@@ -49,21 +47,6 @@ def custom_greedy(model, tok_context, **gen_config):
 	return context
 
 
-def custom_beam_search(model, tok_context, **gen_config):
-	"""
-	Custom beam search decoding
-	:param model:
-	:param tf_inputs:
-	:param gen_config:
-	:return:
-	"""
-	MAX_GEN_TOKENS = gen_config.pop("max_new_tokens", 100)
-	CHUNK_SIZE = model.config.max_position_embeddings
-	TEMP = gen_config.pop("temperature", 1.0)
-	
-	pass
-
-
 def decode(
 		model,
 		tokenizer,
@@ -72,44 +55,44 @@ def decode(
 		decoding_strategy: str = 'greedy'
 ):
 	"""
-	Decoder output
-	:param model:
-	:param tokenizer:
-	:param context:
-	:param max_output_len:
-	:param decoding_strategy:
-	:return:
+	Perform Decoding for Generation Tasks
+	
+	:param model: Pre-trained language model
+	:param tokenizer: Tokenizer
+	:param context:  Context
+	:param max_output_len: Maximum output length
+	:param decoding_strategy: Decoding strategy
+	
+	:return: Decoded output
 	"""
 	# Tokenize the context
-	tokenized_context = tokenizer(context, return_tensors='pt')
+	tok_context = tok(context, return_tensors='pt')
+	tok_context = {k: v.to(device) for k, v in tok_context.items()}
 	
 	# Generate the output
 	if decoding_strategy == 'greedy':
 		output = model.generate(
-			**tokenized_context,
+			**tok_context,
 			max_new_tokens=max_output_len,
 			early_stopping=True,
 			do_sample=False
 		)
 		custom_output = custom_greedy(
 			model=model,
-			tok_context=tokenized_context,
+			tok_context=tok_context,
 			max_new_tokens=max_output_len,
-			temperature=1.0,
+			early_stopping=True,
 			do_sample=False
 		)
+		assert output == custom_output
 	
 	else:
 		raise NotImplementedError
 	
-	# Decode the output
+	# Decode the generated output
 	decoded_output = tokenizer.decode(output[0], skip_special_tokens=True)
-	custom_decoded_output = tokenizer.decode(custom_output[0], skip_special_tokens=True)
-	
-	print("{} Output:\n" + 100 * '-'.format(decoding_strategy))
+	print("{} Decoding Output:\n" + 100 * '-'.format(decoding_strategy))
 	print(decoded_output)
-	print("{} Custom Implementation Output:\n" + 100 * '-'.format(decoding_strategy))
-	print(custom_decoded_output)
 	
 	return decoded_output
 
@@ -131,7 +114,7 @@ if __name__ == '__main__':
 	decoder_output = decode(
 		model=LLM,
 		tokenizer=tok,
-		context=context_sent,
+		tok_context=tokenized_context,
 		max_output_len=max_gen_seq_len
 	)
 
