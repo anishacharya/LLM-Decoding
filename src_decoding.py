@@ -146,11 +146,11 @@ if __name__ == '__main__':
 		decoding_strategy='greedy'
 	)
 	print(f"\n Greedy Decoding\n" + 100 * "-")
+	print(greedy_output)
 	
 	BEAM_SIZE = [2, 3, 5, 10, 20]
 	
 	for beam_size in BEAM_SIZE:
-		print(f"Beam Search Decoding with beam size: {beam_size}\n" + 100 * "-")
 		beam_search_output = decode(
 			model=LLM,
 			tokenizer=tok,
