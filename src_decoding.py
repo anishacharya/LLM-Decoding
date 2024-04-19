@@ -150,7 +150,7 @@ if __name__ == '__main__':
 	# print(f"Greedy Decoding\n" + 100 * "-")
 	# print(greedy_output)
 	
-	BEAM_SIZES = [2, 3, 5, 10]
+	BEAM_SIZES = [2]
 	
 	for n_beam in BEAM_SIZES:
 		beam_search_output = decode(
