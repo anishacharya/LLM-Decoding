@@ -109,12 +109,12 @@ if __name__ == '__main__':
 	tok = AutoTokenizer.from_pretrained(nw)
 	print("Number of parameters:", LLM.num_parameters())
 	
-	context_sent = 'I enjoy walking with my cute dog'
+	test_x = 'I enjoy walking with my cute dog'
 	
 	decoder_output = decode(
 		model=LLM,
 		tokenizer=tok,
-		tok_context=tokenized_context,
+		context=test_x,
 		max_output_len=max_gen_seq_len
 	)
 
