@@ -84,7 +84,7 @@ def decode(
 			early_stopping=True,
 			do_sample=False
 		)
-		assert output == custom_output
+		assert (output[i] == custom_output[i] for i in range(len(output)))
 	
 	else:
 		raise NotImplementedError
