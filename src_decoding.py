@@ -13,37 +13,55 @@ from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 
 
-def custom_greedy(model, tf_inputs, **gen_config):
+def custom_greedy(model, tok_context, **gen_config):
 	"""
 	Custom greedy decoding
 	:param model:
-	:param tf_inputs:
+	:param tok_context:
 	:param gen_config:
 	:return:
 	"""
-	MAX_NEW_TOKENS = gen_config.pop("max_new_tokens", 100)
-	BLOCK_SIZE = model.config.max_position_embeddings
-	TAU = gen_config.pop("temperature", 1.0)
+	MAX_GEN_TOKENS = gen_config.pop("max_new_tokens", 100)
+	CHUNK_SIZE = model.config.max_position_embeddings
+	TEMP = gen_config.pop("temperature", 1.0)
 	DO_SAMPLE = gen_config.pop("do_sample", False)
 	
-	context = tf_inputs['input_ids']
+	context = tok_context['input_ids']
 	past_key_values = None
 	
 	model.eval()
 	
 	with torch.no_grad():
-		for _ in tqdm(range(MAX_NEW_TOKENS)):
-			block_context = context[:, -BLOCK_SIZE:]
+		# Generate new tokens - Sequential Decoding
+		for _ in tqdm(range(MAX_GEN_TOKENS)):
+			block_context = context[:, -CHUNK_SIZE:]
 			model_out = model(block_context, past_key_values)
-			logits = model_out.logits / TAU
+			logits = model_out.logits / TEMP
 			probs = F.softmax(logits[:, -1, :], dim=-1)
-			if DO_SAMPLE:
-				new_token = torch.multinomial(probs, 1)
-			else:
-				new_token = torch.argmax(probs, dim=-1, keepdim=True)
+			
+			# if DO_SAMPLE:
+			# 	new_token = torch.multinomial(probs, 1)
+			# else:
+			
+			new_token = torch.argmax(probs, dim=-1, keepdim=True)
 			context = torch.cat([context, new_token], dim=-1)
 	
 	return context
+
+
+def custom_beam_search(model, tok_context, **gen_config):
+	"""
+	Custom beam search decoding
+	:param model:
+	:param tf_inputs:
+	:param gen_config:
+	:return:
+	"""
+	MAX_GEN_TOKENS = gen_config.pop("max_new_tokens", 100)
+	CHUNK_SIZE = model.config.max_position_embeddings
+	TEMP = gen_config.pop("temperature", 1.0)
+	
+	pass
 
 
 def decode(
@@ -75,7 +93,7 @@ def decode(
 		)
 		custom_output = custom_greedy(
 			model=model,
-			tf_inputs=tokenized_context,
+			tok_context=tokenized_context,
 			max_new_tokens=max_output_len,
 			temperature=1.0,
 			do_sample=False
