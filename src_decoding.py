@@ -144,16 +144,16 @@ if __name__ == '__main__':
 	
 	BEAM_SIZES = [2, 3, 5, 10]
 	
-	# for n_beam in BEAM_SIZES:
-	# 	beam_search_output = decode(
-	# 		model=LLM,
-	# 		tokenizer=tok,
-	# 		context=test_x,
-	# 		max_output_len=max_gen_seq_len,
-	# 		num_beams=n_beam,
-	# 		decoding_strategy='beam_search'
-	# 	)
-	# 	print(f"Beam Search Decoding with Beam Size = {n_beam}\n" + 100 * "-")
-	# 	print(beam_search_output)
+	for n_beam in BEAM_SIZES:
+		beam_search_output = decode(
+			model=LLM,
+			tokenizer=tok,
+			context=test_x,
+			max_output_len=max_gen_seq_len,
+			num_beams=n_beam,
+			decoding_strategy='beam_search'
+		)
+		print(f"Beam Search Decoding with Beam Size = {n_beam}\n" + 100 * "-")
+		print(beam_search_output)
 
 
